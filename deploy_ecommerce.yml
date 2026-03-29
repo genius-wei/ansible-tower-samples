@@ -1,11 +1,40 @@
 - name: deploy web server
   hosts: web
   become: yes
+
+  vars:
+    nginx_port: 8080
+
   tasks:
+
     - name: install nginx
       yum:
         name: nginx
         state: present
+
+    - name: modify nginx port
+      replace:
+        path: /etc/nginx/nginx.conf
+        regexp: 'listen\s+80;'
+        replace: 'listen {{ nginx_port }};'
+
+    - name: check port usage
+      shell: ss -lntp | grep :{{ nginx_port }} || true
+      register: port_check
+
+    - name: show port usage
+      debug:
+        var: port_check.stdout
+
+    - name: check nginx config
+      command: nginx -t
+      register: nginx_test
+      ignore_errors: yes
+
+    - name: fail if config error
+      fail:
+        msg: "nginx 配置文件错误"
+      when: nginx_test.rc != 0
 
     - name: start nginx
       service:
@@ -13,17 +42,35 @@
         state: started
         enabled: yes
 
+    - name: verify nginx running
+      shell: systemctl is-active nginx
+      register: nginx_status
+
+    - name: fail if nginx not running
+      fail:
+        msg: "nginx 启动失败"
+      when: nginx_status.stdout != "active"
+
 - name: deploy database
   hosts: db
   become: yes
   tasks:
-    - name: install mysql
-      yum:
-        name: mariadb-server
-        state: present
+    - name: initialize mysql database
+        command: mysql_install_db --user=mysql
+      args:
+        creates: /var/lib/mysql/mysql
 
-    - name: start mysql
-      service:
-        name: mariadb
-        state: started
-        enabled: yes
+  - name: start mariadb
+    service:
+      name: mariadb
+      state: started
+      enabled: yes
+
+  - name: check mysql status
+    shell: systemctl is-active mariadb
+    register: mysql_status
+
+  - name: fail if mysql not running
+    fail:
+    msg: "MySQL 启动失败"
+    when: mysql_status.stdout != "active"
