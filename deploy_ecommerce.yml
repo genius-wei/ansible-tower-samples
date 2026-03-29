@@ -52,7 +52,7 @@
       when: nginx_status.stdout != "active"
     - name: deploy web page
       copy:
-        content: "Hello E-commerce System"
+        content: "Hello 这里是林振威的毕业设计"
         dest: /usr/share/nginx/html/index.html
 
 - name: deploy database
