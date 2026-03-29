@@ -58,7 +58,7 @@
     - name: initialize mysql database
       command: mysql_install_db --user=mysql
       args:
-      creates: /var/lib/mysql/mysql
+        creates: /var/lib/mysql/mysql
 
   - name: start mariadb
     service:
@@ -72,5 +72,5 @@
 
   - name: fail if mysql not running
     fail:
-    msg: "MySQL 启动失败"
+      msg: "MySQL 启动失败"
     when: mysql_status.stdout != "active"
