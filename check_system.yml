@@ -1,0 +1,28 @@
+- name: system inspection
+  hosts: all
+  become: yes
+  tasks:
+
+    - name: check cpu load
+      shell: top -bn1 | grep "load average"
+      register: cpu_result
+
+    - name: show cpu
+      debug:
+        var: cpu_result.stdout
+
+    - name: check disk usage
+      shell: df -h
+      register: disk_result
+
+    - name: show disk
+      debug:
+        var: disk_result.stdout
+
+    - name: check port 80
+      shell: netstat -ntlp | grep 80 || echo "port 80 not running"
+      register: port_result
+
+    - name: show port
+      debug:
+        var: port_result.stdout
