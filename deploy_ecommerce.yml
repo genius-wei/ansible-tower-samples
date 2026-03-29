@@ -50,6 +50,10 @@
       fail:
         msg: "nginx 启动失败"
       when: nginx_status.stdout != "active"
+    - name: deploy web page
+      copy:
+        content: "Hello E-commerce System"
+        dest: /usr/share/nginx/html/index.html
 
 - name: deploy database
   hosts: db
