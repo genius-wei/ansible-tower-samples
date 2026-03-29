@@ -27,9 +27,3 @@
         name: mariadb
         state: started
         enabled: yes
-
-
-- name: deploy web page
-  copy:
-    content: "Hello E-commerce System"
-    dest: /usr/share/nginx/html/index.html
