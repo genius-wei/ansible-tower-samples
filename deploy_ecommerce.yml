@@ -60,17 +60,17 @@
       args:
         creates: /var/lib/mysql/mysql
 
-  - name: start mariadb
-    service:
-      name: mariadb
-      state: started
-      enabled: yes
+    - name: start mariadb
+      service:
+        name: mariadb
+        state: started
+        enabled: yes
 
-  - name: check mysql status
-    shell: systemctl is-active mariadb
-    register: mysql_status
+    - name: check mysql status
+      shell: systemctl is-active mariadb
+      register: mysql_status
 
-  - name: fail if mysql not running
-    fail:
-      msg: "MySQL 启动失败"
-    when: mysql_status.stdout != "active"
+    - name: fail if mysql not running
+      fail:
+        msg: "MySQL 启动失败"
+      when: mysql_status.stdout != "active"
